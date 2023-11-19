@@ -23,7 +23,7 @@ def homePage(request):
         print("Received data:", serial_data)
 
         # Pass the data to the template
-        return render(request, "arduino/index.html", {'data': serial_data})
+        return render(request, "index.html", {'data': serial_data})
 
     except Exception as e:
         # Handle exceptions
