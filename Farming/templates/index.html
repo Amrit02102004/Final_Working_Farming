@@ -1,4 +1,4 @@
-{% load static %}
+<!-- index.html -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -127,94 +127,82 @@
   </div>
 
   <script>
-     // script.js
+    // script.js
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Function to update background based on moisture level
-  function updateBackground(moistureLevel) {
-    var body = document.body;
-    // Remove existing background classes
-    body.classList.remove("desert-bg", "water-bg");
-    
-    // Add the appropriate background class based on moisture level
-    if (moistureLevel <= 25) {
-      body.classList.add("desert-bg");
-    } else {
-      body.classList.add("water-bg");
-    }
-  }
+    document.addEventListener("DOMContentLoaded", function () {
+      function updateBackground(moistureLevel) {
+        var body = document.body;
+        body.classList.remove("desert-bg", "water-bg");
 
-  // Function to update image based on moisture level
-  function updateImages(moistureLevel) {
-    if (moistureLevel <= 25) {
-      document.getElementById("image1").style.display = "block";
-    } else if (moistureLevel >= 70) {
-      document.getElementById("image2").style.display = "block";
-    } else {
-      document.getElementById("image3").style.display = "block";
-    }
-  }
-
-  // Function to update progress bar based on moisture level
-  function updateProgressBar(target) {
-    const progressFill = document.querySelector(".progressFill");
-    const block = document.getElementsByClassName("block");
-    for (var i = 1; i < target; i++) {
-      progressFill.innerHTML += "<div class='block'></div>";
-      block[i].style.transform = "rotate(" + 3.6 * i + "deg)";
-      block[i].style.animationDelay = `${i / 50}s`;
-    }
-  }
-
-  // Function to update counter based on moisture level
-  function updateCounter(target) {
-    const counter = document.querySelector(".counter");
-    counter.innerText = target;
-
-    // NumberCounter function for smooth counting animation
-    const NumberCounter = () => {
-      const value = +counter.innerText;
-      if (value < target) {
-        counter.innerText = Math.ceil(value + 1);
-        setTimeout(() => {
-          NumberCounter();
-        }, 25);
+        if (moistureLevel <= 25) {
+          body.classList.add("desert-bg");
+        } else {
+          body.classList.add("water-bg");
+        }
       }
-    };
 
-    // Start the counting animation
-    NumberCounter();
-  }
+      function updateImages(moistureLevel) {
+        if (moistureLevel <= 25) {
+          document.getElementById("image1").style.display = "block";
+        } else if (moistureLevel >= 70) {
+          document.getElementById("image2").style.display = "block";
+        } else {
+          document.getElementById("image3").style.display = "block";
+        }
+      }
 
-  // Function to fetch Arduino data and update UI
-  function fetchDataAndUpdateUI() {
-    fetch("/arduino-data/") // Update the URL based on your project's structure
-      .then((response) => response.json())
-      .then((data) => {
-        // Extract moisture level from Arduino data
-        const moistureLevel = parseInt(data.data);
+      function updateProgressBar(target) {
+        const progressFill = document.querySelector(".progressFill");
+        const block = document.getElementsByClassName("block");
+        for (var i = 1; i < target; i++) {
+          progressFill.innerHTML += "<div class='block'></div>";
+          block[i].style.transform = "rotate(" + 3.6 * i + "deg)";
+          block[i].style.animationDelay = `${i / 50}s`;
+        }
+      }
 
-        // Update background, images, progress bar, and counter based on moisture level
-        updateBackground(moistureLevel);
-        updateImages(moistureLevel);
-        updateProgressBar(moistureLevel);
-        updateCounter(moistureLevel);
+      function updateCounter(target) {
+        const counter = document.querySelector(".counter");
+        counter.innerText = target;
 
-        // Log moisture level to the console
-        console.log("Moisture Level:", moistureLevel);
-      })
-      .catch((error) =>
-        console.error("Error fetching Arduino data:", error)
-      );
-  }
+        const NumberCounter = () => {
+          const value = +counter.innerText;
+          if (value < target) {
+            counter.innerText = Math.ceil(value + 1);
+            setTimeout(() => {
+              NumberCounter();
+            }, 25);
+          }
+        };
 
-  // Call fetchDataAndUpdateUI immediately
-  fetchDataAndUpdateUI();
+        NumberCounter();
+      }
 
-  // Set up an interval to update the moisture level every 5 seconds
-  setInterval(fetchDataAndUpdateUI, 5000);
-});
+      function fetchDataAndUpdateUI() {
+        fetch("/arduino-data/") // Update the URL based on your project's structure
+          .then((response) => response.json())
+          .then((data) => {
+            const moistureLevel = parseInt(data.data);
 
+            if (!isNaN(moistureLevel)) {
+              updateBackground(moistureLevel);
+              updateImages(moistureLevel);
+              updateProgressBar(moistureLevel);
+              updateCounter(moistureLevel);
+
+              console.log("Moisture Level:", moistureLevel);
+            } else {
+              console.error("Invalid moisture level received:", data.data);
+            }
+          })
+          .catch((error) =>
+            console.error("Error fetching Arduino data:", error)
+          );
+      }
+
+      fetchDataAndUpdateUI();
+      setInterval(fetchDataAndUpdateUI, 5000);
+    });
   </script>
 </body>
 
