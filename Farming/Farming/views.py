@@ -14,19 +14,17 @@ def arduino_data(request):
 
     # Create a serial object
     ser = serial.Serial(port, baud_rate, timeout=1)
-
+    L = []
     try:
         # Read a line from the serial port
         serial_data = ser.readline().decode('utf-8').strip()
-
-        # Close the serial connection
-        ser.close()
+        L.append(serial_data)
 
         # Print the received data
-        print("Received data:", serial_data)
+        print("Received data:", L[-1])
 
         # Return the data as JSON response
-        return JsonResponse({'data': serial_data})
+        return JsonResponse({'data': L[-1]})
 
     except Exception as e:
         # Handle exceptions
